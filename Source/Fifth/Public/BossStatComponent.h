@@ -4,18 +4,18 @@
 
 #include "Fifth.h"
 #include "Components/ActorComponent.h"
-#include "WarriorStatComponent.generated.h"
+#include "BossStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHPIsZeroDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class FIFTH_API UWarriorStatComponent : public UActorComponent
+class FIFTH_API UBossStatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UWarriorStatComponent();
+	UBossStatComponent();
 
 protected:
 	// Called when the game starts
@@ -26,21 +26,18 @@ public:
 	void SetNewLevel(int32 NewLevel);
 	void SetDamage(float NewDamage);
 	float GetAttack();
-	float GetSAttack();
+	float GetKick();
+	float GetSkill();
 
 	FOnHPIsZeroDelegate OnHPIsZero;
 
-	//UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = SAttack, Meta = (AllowPrivateAccess = true))
-		//bool SAttackCheck{ false };
-
 private:
-	struct FWarriorData* CurrentStatData = nullptr;
+	struct FBossTankData* CurrentStatData = nullptr;
 
 	UPROPERTY(EditInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = true))
 		int32 Level;
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = true))
 		float CurrentHP;
-
-	
+		
 };

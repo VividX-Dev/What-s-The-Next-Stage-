@@ -8,7 +8,7 @@ UShadowAnimInstance::UShadowAnimInstance()
 	CurrentPawnSpeed = 0.0f;
 	IsDead = false;
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> ATTACK_MONTAGE(
-		TEXT("/Game/MyCharacter/Animation/Shadow_Test.Shadow_Test"));
+		TEXT("/Game/MyCharacter/Animation/WarriorOfFire_OneHandSword_Combo.WarriorOfFire_OneHandSword_Combo"));
 	if (ATTACK_MONTAGE.Succeeded())
 	{
 		AttackMontage = ATTACK_MONTAGE.Object;

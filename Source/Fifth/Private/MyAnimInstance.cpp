@@ -8,10 +8,17 @@ UMyAnimInstance::UMyAnimInstance()
 	CurrentPawnSpeed = 0.0f;
 	IsDead = false;
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> ATTACK_MONTAGE(
-		TEXT("/Game/MyCharacter/Animation/WarriorOfFire_Test.WarriorOfFire_Test"));
+		TEXT("/Game/MyCharacter/Animation/WarriorOfFire_OneHandSword_Combo.WarriorOfFire_OneHandSword_Combo"));
 	if (ATTACK_MONTAGE.Succeeded())
 	{
 		AttackMontage = ATTACK_MONTAGE.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
+		SATTACK_MONTAGE(TEXT("/Game/MyCharacter/Animation/WarriorOfFire_SAttack.WarriorOfFire_SAttack"));
+	if (SATTACK_MONTAGE.Succeeded())
+	{
+		SAttackMontage = SATTACK_MONTAGE.Object;
 	}
 }
 
@@ -38,6 +45,13 @@ void UMyAnimInstance::PlayAttackMontage()
 	
 }
 
+void UMyAnimInstance::PlaySAttackMontage()
+{
+	ABCHECK(!IsDead);
+	Montage_Play(SAttackMontage, 1.0f);
+
+}
+
 
 
 void UMyAnimInstance::JumpToAttackMontageSection(int32 NewSection)
@@ -48,9 +62,19 @@ void UMyAnimInstance::JumpToAttackMontageSection(int32 NewSection)
 	//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("NewSection : %d "), NewSection));
 }
 
+void UMyAnimInstance::AnimNotify_P_Sparks()
+{
+	
+}
+
 void UMyAnimInstance::AnimNotify_AttackHitCheck()
 {
 	OnAttackHitCheck.Broadcast();
+}
+
+void UMyAnimInstance::AnimNotify_SAttackHitCheck()
+{
+	OnSAttackHitCheck.Broadcast();
 }
 
 void UMyAnimInstance::AnimNotify_NextAttackCheck()

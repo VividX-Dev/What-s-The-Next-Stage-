@@ -146,7 +146,7 @@ void AATank::Damaged()
 
 void AATank::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	ABCHECK(IsAttacking);
+	//ABCHECK(IsAttacking);
 	
 	IsAttacking = false;
 	//IsDamaging = false;
@@ -157,7 +157,7 @@ void AATank::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void AATank::OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	ABCHECK(IsDamaging);
+	//ABCHECK(IsDamaging);
 
 	//IsAttacking = false;
 	IsDamaging = false;
@@ -209,6 +209,11 @@ void AATank::AttackCheck()
 
 			FDamageEvent DamageEvent;
 			HitResult.Actor->TakeDamage(TankStat->GetAttack(), DamageEvent, GetController(), this);
+			UParticleSystem* ElectricAttackBoomEffect =
+				Cast<UParticleSystem>(StaticLoadObject(UParticleSystem::StaticClass(), NULL,
+					TEXT("ParticleSystem'/Game/StarterContent/Particles/P_Sparks.P_Sparks'")));
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ElectricAttackBoomEffect,
+				this->GetActorLocation());
 		
 			//ABLOG(Warning, TEXT("2Ok!!"));
 			Damaged();

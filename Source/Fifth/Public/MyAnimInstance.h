@@ -8,6 +8,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnNextAttackCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAttackHitCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnSAttackHitCheckDelegate);
 
 /**
  * 
@@ -23,16 +24,25 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayAttackMontage();
+	void PlaySAttackMontage();
+
 	void JumpToAttackMontageSection(int32 NewSection);
 
 public:
 	FOnNextAttackCheckDelegate OnNextAttackCheck;
 	FOnAttackHitCheckDelegate OnAttackHitCheck;
+	FOnSAttackHitCheckDelegate OnSAttackHitCheck;
 	void SetDeadAnim() { IsDead = true; }
 
 private:
 	UFUNCTION()
 		void AnimNotify_AttackHitCheck();
+
+	UFUNCTION()
+		void AnimNotify_SAttackHitCheck();
+
+	UFUNCTION()
+		void AnimNotify_P_Sparks();
 
 	UFUNCTION()
 		void AnimNotify_NextAttackCheck();
@@ -45,6 +55,9 @@ private:
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
 		UAnimMontage*  AttackMontage;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = SAttack, Meta = (AllowPrivateAccess = true))
+		UAnimMontage* SAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
 		bool IsDead;

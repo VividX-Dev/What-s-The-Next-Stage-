@@ -41,14 +41,14 @@ void UATankAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UATankAnimInstance::PlayAttackMontage()
 {
-	ABCHECK(!IsDead);
+	//ABCHECK(!IsDead);
 	Montage_Play(AttackMontage, 1.0f);
 }
 
 void UATankAnimInstance::PlayDamagedMontage()
 {
 	//ABLOG(Warning, TEXT("Hey!!"));
-	ABCHECK(!IsDead);
+	//ABCHECK(!IsDead);
 	Montage_Play(DamagedMontage, 1.0f);
 	
 }

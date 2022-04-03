@@ -8,8 +8,8 @@
 
 AMyGameMode::AMyGameMode()
 {
-	//DefaultPawnClass = AMyCharacter::StaticClass();
-	DefaultPawnClass = AManOfFire::StaticClass();
+	DefaultPawnClass = AMyCharacter::StaticClass();
+	//DefaultPawnClass = AManOfFire::StaticClass();
 	PlayerControllerClass = AMyPlayerController::StaticClass();
 }
 
