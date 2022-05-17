@@ -5,6 +5,11 @@
 #include "ManAnimInstance.h"
 #include "ManStatComponent.h"
 #include "DrawDebugHelpers.h"
+#include "ManSetting.h"
+#include "MyPlayerController.h"
+#include "WarriorOfFire.h"
+#include "MyGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AManOfFire::AManOfFire()
@@ -24,12 +29,7 @@ AManOfFire::AManOfFire()
 	SpringArm->TargetArmLength = 400.0f;
 	SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> ManOfFire(TEXT
-	("/Game/MyCharacter/Characters/ManOfFire.ManOfFire"));
-	if (ManOfFire.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(ManOfFire.Object);
-	}
+	
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
@@ -46,6 +46,7 @@ AManOfFire::AManOfFire()
 	SetControlMode(0);
 
 	IsAttacking = false;
+	IsTransforming = false;
 	MaxCombo = 3;
 	AttackEndComboState();
 
@@ -53,6 +54,8 @@ AManOfFire::AManOfFire()
 
 	AttackRange = 200.0f;
 	AttackRadius = 50.0f;
+
+	//ChangePawn = false;
 }
 
 // Called when the game starts or when spawned
@@ -73,7 +76,7 @@ void AManOfFire::SetControlMode(int32 ControlMode)
 		SpringArm->bInheritPitch = true;
 		SpringArm->bInheritRoll = true;
 		SpringArm->bInheritYaw = true;
-		SpringArm->bDoCollisionTest = true;
+		SpringArm->bDoCollisionTest = false;
 		bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 		GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
@@ -94,7 +97,7 @@ void AManOfFire::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction(TEXT("Attack"),EInputEvent::IE_Pressed, this, &AManOfFire::Attack);
-	PlayerInputComponent->BindAction(TEXT("SAttack"), EInputEvent::IE_Pressed, this, &AManOfFire::SAttack);
+	PlayerInputComponent->BindAction(TEXT("SAttack"), EInputEvent::IE_Pressed, this, &AManOfFire::Transform);
 
 	PlayerInputComponent->BindAxis(TEXT("UpDown"), this, &AManOfFire::UpDown);
 	PlayerInputComponent->BindAxis(TEXT("LeftRight"), this, &AManOfFire::LeftRight);
@@ -106,10 +109,17 @@ void AManOfFire::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AManOfFire::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	NewCon = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+	ABCHECK(nullptr != NewCon);
+
+	MyGame = Cast<AMyGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	ABCHECK(nullptr != MyGame);
+
 	ManAnim = Cast<UManAnimInstance>(GetMesh()->GetAnimInstance());
 	ABCHECK(nullptr != ManAnim);
 
 	ManAnim->OnMontageEnded.AddDynamic(this, &AManOfFire::OnAttackMontageEnded);
+	ManAnim->OnMontageEnded.AddDynamic(this, &AManOfFire::OnTransformMontageEnded);
 
 	ManAnim->OnNextAttackCheck.AddLambda([this]()->void {
 		ABLOG(Warning, TEXT("OnNextAttackCheck"));
@@ -172,9 +182,21 @@ void AManOfFire::Attack()
 	}
 }
 
-void AManOfFire::SAttack()
+void AManOfFire::Transform()
 {
-	ABLOG_S(Warning);
+	//ABLOG(Warning, TEXT("TRANSFORM!!!"));
+	if (IsTransforming) return;
+
+	ManAnim->PlayTransformMontage();
+
+	IsTransforming = true;
+	//ChangePawn = true;
+
+	//AMyPlayerController* NewCon{};
+	APawn* Newpawn = Cast<APawn>(AWarriorOfFire::StaticClass());
+	NewCon->OnPossess(Newpawn);
+	
+	
 }
 
 void AManOfFire::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -183,6 +205,14 @@ void AManOfFire::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	ABCHECK(CurrentCombo > 0);
 	IsAttacking = false;
 	AttackEndComboState();
+}
+
+void AManOfFire::OnTransformMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	ABCHECK(IsTransforming);
+	
+	IsTransforming = false;
+	
 }
 
 void AManOfFire::AttackStartComboState()

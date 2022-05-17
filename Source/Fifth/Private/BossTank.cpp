@@ -6,6 +6,8 @@
 #include "BossStatComponent.h"
 #include "DrawDebugHelpers.h"
 #include "BossAIController.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 ABossTank::ABossTank()
@@ -40,6 +42,7 @@ ABossTank::ABossTank()
 	IsKicking = false;
 	IsSkillUsing = false;
 	IsSpecialAttacking = false;
+	IsScreaming = false;
 
 	AttackRange = 200.0f;
 	AttackRadius = 50.0f;
@@ -75,6 +78,11 @@ void ABossTank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsDamaging)
+	{
+		SetActorLocation(GetActorLocation() + GetControlRotation().Vector());
+	}
+
 }
 
 // Called to bind functionality to input
@@ -104,12 +112,17 @@ void ABossTank::PostInitializeComponents()
 float ABossTank::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
+	ABLOG(Warning, TEXT("BOSSDAMAGED"));
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	ABLOG(Warning, TEXT("Actor : %s took Damage : %f"), *GetName(), FinalDamage);
 	Damaged();
 	BossStat->SetDamage(FinalDamage);
 
-
+	UNiagaraSystem* HitEffect =
+		Cast<UNiagaraSystem>(StaticLoadObject(UNiagaraSystem::StaticClass(), NULL,
+			TEXT("/Game/Effect/Hit.Hit")));
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect,
+		this->GetActorLocation() + FVector(100.0f, 20.0f, 0.0f), this->GetActorRotation());
 
 	return FinalDamage;
 }
@@ -163,6 +176,14 @@ void ABossTank::SpecialAttack()
 	IsAttacking = true;
 }
 
+void ABossTank::Screaming()
+{
+	if (IsScreaming) return;
+
+	BTAnim->PlayScreamMontage();
+	IsScreaming = true;
+}
+
 void ABossTank::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	IsAttacking = false;
@@ -188,6 +209,11 @@ void ABossTank::OnSkillMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 void ABossTank::OnSpecialMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	IsSpecialAttacking = false;
+}
+
+void ABossTank::OnScreamMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	IsScreaming = false;
 }
 
 void ABossTank::AttackCheck()

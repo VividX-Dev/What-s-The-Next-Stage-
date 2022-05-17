@@ -19,11 +19,12 @@ EBTNodeResult::Type UTBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 	auto ATank = Cast<AATank>(OwnerComp.GetAIOwner()->GetPawn());
 	if (nullptr == ATank)
 		return EBTNodeResult::Failed;
-
+	
 	ATank->Attack();
 	IsAttacking = true;
 	ATank->OnAttackEnd.AddLambda([this]()->void {
 		IsAttacking = false;
+		//ABLOG(Warning, TEXT("PLAYING!!!"));
 		});
 
 	return EBTNodeResult::InProgress;

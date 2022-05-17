@@ -48,12 +48,20 @@ private:
 	UFUNCTION()
 		void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	UFUNCTION()
+		void OnTransformMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 	void AttackStartComboState();
 	void AttackEndComboState();
 	void AttackCheck();
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
 		bool IsAttacking;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Transform, Meta = (AllowPrivateAccess = true))
+		bool IsTransforming;
+
+	
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
 		bool CanNextCombo; 
@@ -70,6 +78,12 @@ private:
 	UPROPERTY()
 		class UManAnimInstance* ManAnim;
 
+	UPROPERTY()
+		class AMyPlayerController* NewCon;
+
+	UPROPERTY()
+		class AMyGameMode* MyGame;
+
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
 		float AttackRange;
 
@@ -78,5 +92,8 @@ private:
 
 public:
 	void Attack();
-	void SAttack();
+	void Transform();
+
+	//UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Transform, Meta = (AllowPrivateAccess = true))
+		//bool ChangePawn;
 };

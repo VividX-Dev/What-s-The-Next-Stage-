@@ -14,8 +14,22 @@ UTBTDecorator_IsInAttackRange::UTBTDecorator_IsInAttackRange()
 
 bool UTBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp,
 	uint8* NodeMemory) const
-
 {
+	//ABLOG(Warning, TEXT("TARGET ON2"));
+	int x = 0;
+	x = FMath::RandRange(1, 100);
+
+	if (x < 90)
+	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsInt(ATankAIController::SelectAttackNumberKey, 1);
+	}
+	else
+	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsInt(ATankAIController::SelectAttackNumberKey, 2);
+	}
+	//ABLOG(Warning, TEXT("Hit Actor Name: %s"), *HitResult.Actor->GetName());
+	//ABLOG(Warning, TEXT("X: %d"), x);
+
 	bool bResult = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();

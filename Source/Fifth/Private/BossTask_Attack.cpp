@@ -5,6 +5,9 @@
 #include "BossAIController.h"
 #include "MyCharacter.h"
 #include "BossTank.h"
+#include "BehaviorTree/BlackboardComponent.h"
+
+
 
 UBossTask_Attack::UBossTask_Attack()
 {
@@ -21,11 +24,18 @@ EBTNodeResult::Type UBossTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	if (nullptr == BossTank)
 		return EBTNodeResult::Failed;
 
+	
+
+	
 	BossTank->Attack();
 	IsAttacking = true;
 	BossTank->OnAttackEnd.AddLambda([this]()->void {
 		IsAttacking = false;
 		});
+	
+	
+	
+	
 
 	return EBTNodeResult::InProgress;
 

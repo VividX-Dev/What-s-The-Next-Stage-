@@ -9,6 +9,7 @@
 const FName ATankAIController::HomePosKey(TEXT("HomePos"));
 const FName ATankAIController::PatrolPosKey(TEXT("PatrolPos"));
 const FName ATankAIController::TargetKey(TEXT("Target"));
+const FName ATankAIController::SelectAttackNumberKey(TEXT("SelectAttackNumber"));
 
 ATankAIController::ATankAIController()
 {
@@ -32,12 +33,27 @@ void ATankAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
+}
+
+void ATankAIController::RunAI()
+{
+	
 	if (UseBlackboard(BBAsset, Blackboard))
 	{
-		Blackboard->SetValueAsVector(HomePosKey, InPawn->GetActorLocation());
+		Blackboard->SetValueAsVector(HomePosKey, GetPawn()->GetActorLocation());
 		if (!RunBehaviorTree(BTAsset))
 		{
 			ABLOG(Error, TEXT("TankAIController couldn't run behavior tree!"));
 		}
 	}
+}
+
+void ATankAIController::StopAI()
+{
+	auto BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+	if (nullptr!=BehaviorTreeComponent)
+	{
+		BehaviorTreeComponent->StopTree(EBTStopMode::Safe);
+	}
+	
 }
