@@ -357,7 +357,7 @@ void AATank::AttackCheck()
 			FDamageEvent DamageEvent;
 			HitResult.Actor->TakeDamage(TankStat->GetAttack(), DamageEvent, GetController(), this);
 			
-			Damaged();
+			//Damaged();
 		}
 	}
 }
