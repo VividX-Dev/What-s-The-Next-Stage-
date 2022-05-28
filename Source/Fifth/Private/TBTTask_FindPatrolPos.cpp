@@ -14,6 +14,7 @@ UTBTTask_FindPatrolPos::UTBTTask_FindPatrolPos()
 EBTNodeResult::Type UTBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 	uint8* NodeMemory)
 {
+	
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
@@ -21,14 +22,21 @@ EBTNodeResult::Type UTBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Failed;
 
 	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
-	if (nullptr == NavSystem)
+	if (nullptr == NavSystem) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Debug %f"), 123.0f));
 		return EBTNodeResult::Failed;
+
+	}
 
 	FVector Origin = OwnerComp.GetBlackboardComponent()->GetValueAsVector(ATankAIController::HomePosKey);
 	FNavLocation NextPatrol;
-
-	if (NavSystem->GetRandomPointInNavigableRadius(Origin, 500.0f, NextPatrol))
+	
+	if(NavSystem->GetRandomPointInNavigableRadius(Origin, 500.0f, NextPatrol) == false)
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("NotPatrol")));
+	if(NavSystem != nullptr)
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("DebugH %f"), Origin.X));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("DebugP %f"), NextPatrol.Location.X));
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(ATankAIController::PatrolPosKey,
 			NextPatrol.Location);
 		return EBTNodeResult::Succeeded;
